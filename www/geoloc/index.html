@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Carte</title>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+		<link rel="stylesheet" href="\header.css">
+		<link rel="stylesheet" href="base.css">
+		<link rel="stylesheet" href="base_map.css">
+		<link rel="stylesheet" href="base_tools.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+		<script src="base_map_loader.js"></script>
+	</head>
+	<body>
+		<header>
+			<div id="logo"></div>
+			<div id="band">
+				<div id="title">
+					<a href="\">STI - Suivi de Tournee Intelligente</a>
+				</div>
+			</div>
+		</header>
+		<section>
+
+			<!-- Carte -->
+			
+			<div id="map">
+				<p class="alert">A0 et R50 non définit</p>
+				<ul class="categories"></ul>
+			</div>
+
+			<!-- Outils -->
+			
+			<div id="tools">
+				<div>
+					<input class="tool_button" type="button" value="Point" onclick="tool('point')">
+					<input class="tool_button" type="button" value="Itinéraire" onclick="tool('path')">
+					<input class="tool_button" type="button" value="Véhicule" onclick="tool('vehicle')">
+					<input class="tool_parameter" type="button" value="¤" onclick="tool('parameters')">
+				</div>
+
+				<!-- Début outils -->
+				
+				<div id="tool">
+
+					<!-- Partie contrôle des points -->
+
+					<div id="point">
+						<div class="hider">
+							<span>Ajouter ou modifier un point</span>
+							<form id="point_add_modify" onsubmit="point_add_modify(); return false;">
+								<select class="categories" required></select>
+								<input class="ref" type="text" placeholder="Point" required>
+								<input class="pos" type="text" placeholder="Position" required>
+								<input type="submit" value="Valider">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Supprimer un point</span>
+							<form id="point_remove" onsubmit="point_remove(); return false;">
+								<select class="point_all ref" required></select>
+								<input type="submit" value="Supprimer">
+							</form>
+						</div>
+					</div>
+
+					<!-- Partie contrôle des itinéraires -->
+
+					<div id="path">
+						<select class="paths"></select>
+						<div class="ul">
+							<ul class="points">
+								Arrêts
+							</ul>
+						</div>
+						<div class="hider">
+							<span>Ajouter un arrêt</span>
+							<form id="path_add_point" onsubmit="path_add_point(); return false;">
+								<input class="ref" type="text" placeholder="Point à ajouter" required>
+								<input class="point" type="text" placeholder="Point précédent" required>
+								<input type="submit" value="Ajouter">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Enlever un arrêt</span>
+							<form id="path_remove_point" onsubmit="path_remove_point(); return false;">
+								<select class="points" required></select>
+								<input type="submit" value="Enlever">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Créer un itinéraire</span>
+							<form id="path_add" onsubmit="path_add(); return false;">
+								<input class="path_ref" type="text" placeholder="Nom" required>
+								<select class="point_all ref" required></select>
+								<input type="submit" value="Créer">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Supprimer un itinéraire</span>
+							<form id="path_remove" onsubmit="path_remove(); return false;">
+								<select class="paths" required></select>
+								<input type="submit" value="Supprimer">
+							</form>
+						</div>
+					</div>
+
+					<!-- Partie contrôle des véhicules -->
+
+					<div id="vehicle">
+						<ul class="vehicles">
+                            Véhicules
+                        </ul>
+						<div class="hider">
+							<span>Ajouter un véhicule</span>
+							<form id="vehicle_add" onsubmit="vehicle_add(); return false;">
+								<input class="vehicle_num" type="number" placeholder="Numéro" required>
+								<input class="vehicle_type" type="text" placeholder="Type" required>
+								<select class="point_all ref" required></select>
+								<input type="submit" value="Ajouter">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Supprimer un véhicule</span>
+							<form id="vehicle_remove" onsubmit="vehicle_remove(); return false;">
+								<select class="vehicles" required></select>
+								<input type="submit" value="Supprimer">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Associer un véhicule</span>
+							<form id="vehicle_link" onsubmit="vehicle_link(); return false;">
+								<select class="vehicles" required></select>
+								<select class="paths"></select>
+								<input type="submit" value="Associer">
+							</form>
+						</div>
+						<div class="hider">
+							<span>Placer un véhicule</span>
+							<form id="vehicle_place" onsubmit="vehicle_place(); return false;">
+								<select class="vehicles" required></select>
+								<select class="point_all" required></select>
+								<input type="submit" value="Placer">
+							</form>
+						</div>
+					</div>
+
+					<!-- Partie contrôle des véhicules -->
+
+					<div id="parameters">
+
+						<div id="origin">
+							<input class="pos" type="text" placeholder="Position" required>
+							<div>
+								<input type="button" value="Définir A0" onclick="setOrigin('A0')">
+								<input type="button" value="Définir R50" onclick="setOrigin('R50')">
+							</div>
+							<div>
+								<span class="a0">A0 : </span><span class="r50">R50 : </span>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- Fin outils -->
+
+			</div>
+		</section>
+	</body>
+	<script>
+		
+		let POINT_START = `W15`;
+		poly_path = L.polyline([], {color:"red"});
+
+		// ////////////////////////////////////////////////////////////////////
+		// Tools control 
+		// ////////////////////////////////////////////////////////////////////
+
+		function tool(tool) {
+			$(`#tool`).children().css(`display`, `none`);
+			$(`#${tool}`).css(`display`, `flex`);
+
+			if(tool == "vehicle") {
+				$(`.cat_vehicle`).fadeIn('slow');
+			}
+			else {
+				$(`.cat_vehicle`).fadeOut('slow');
+			}
+		}
+
+		$(`.hider`).children(`span`).click(hider);
+
+		function hider(event) {
+			let _element = $(event.target.parentElement.children[1]);
+
+			if(_element.css(`display`) == `flex`) {
+				_element.css(`display`, `none`);
+			}
+			else {
+				$(`.hider`).children(`form`).css(`display`, `none`);
+				_element.css(`display`, `flex`);
+			}
+		}
+
+		// ////////////////////////////////////////////////////////////////////
+		// Point
+		// ////////////////////////////////////////////////////////////////////
+
+		function point_add_modify() {
+			let _form = $(`#point_add_modify`);
+			let _category = _form.children(".categories").val();
+			let _ref = _form.children(".ref").val();
+			let _latlng = _form.children(".pos").val().split(",");
+			let _A = INFOS.parameters.A0;
+			let _R = INFOS.parameters.R50;
+			let _x = (_latlng[0] -_A[0])/(_R[0] -_A[0]);
+			let _y = (_latlng[1] -_A[1])/(_R[1] -_A[1]);
+
+			$.get(`${api}/point/set`,{id:_ref, category:_category, x:_x, y:_y})
+				.done(function (data) {
+					mapLoadPoints();
+
+					//_form.children(".categories").val("");
+					_form.children(".ref").val("");
+					_form.children(".pos").val("");
+				});
+		}
+
+		function point_remove() {
+			let _form = $(`#point_remove`);
+			let _ref = _form.children(".ref").val();
+
+			$.get(`${api}/point/remove`, {id:_ref})
+				.done(function (data) {
+					
+					map.removeLayer(INFOS.points[_ref].marker);
+					delete INFOS.points[_ref];
+					
+					_form.children(".ref").val("");
+				});
+		}
+
+		// ////////////////////////////////////////////////////////////////////
+		// Path
+		// ////////////////////////////////////////////////////////////////////
+
+		INFOS.callbacks.push(function () {
+
+			$.get(`${api}/path`)
+                .done(function (data) {
+            		path_fill_select(data.paths);
+				});
+        });
+
+		$(`.paths`).change(function (event) {
+
+			let _ref = $(event.target).val();
+			$(`.paths`).val(_ref);
+
+			if(_ref != null && _ref != undefined && _ref != "")
+				path_load_point(_ref);
+			else {
+				path_clear();
+			}
+		});
+
+		function path_fill_select(_paths) {
+
+			path_clear();
+			$(`.paths`).children().remove();
+			$(`.paths`).append(`<option value="">-- Itinéraire --</option>`);
+
+			INFOS["paths"] = {};
+
+			$.each(_paths, function(_index, _path) {
+				$(`.paths`).append(`
+					<option value="${_path["id"]}">${_path["name"]}</option>
+				`);
+
+				INFOS.paths[_path["id"]] = {
+					name: _path["name"]
+				};
+			});
+		}
+
+		function path_add() {
+			let _form = $(`#path_add`);
+			let _path_ref = _form.children(`.path_ref`).val();
+			let _point = _form.children(`.ref`).val();
+
+			$.get(`${api}/path`, {add:_path_ref})
+				.done(function (data) {
+					path_fill_select(data.paths);
+					_path_id = data.paths[data.paths.length -1].id
+					
+					$.get(`${api}/path/${_path_id}`, {add: _point})
+						.done(function (data) {
+							
+							path_load_point(_path_id);
+						});
+				});
+		}
+		function path_remove() {
+			let _form = $(`#path_remove`);
+			let _ref = _form.children(".paths").val();
+
+			$.get(`${api}/path`, {remove:_ref})
+				.done(function (data) {
+					path_fill_select(data.paths);
+
+					path_clear();
+				});
+		}
+
+		function path_load_point(_path) {
+
+			$.get(`${api}/path/${_path}`)
+                .done(function (data) {
+
+                    // Ajoute les points dans la liste
+                    path_fill_point(data.points);
+                });
+		}
+
+		function path_clear() {
+			$(`ul.points`).children(`li`).remove();
+			$(`select.points`).children(`option`).remove();
+			$(`select.points`).append(`<option value="">-- Point --</option>`);
+			poly_path.remove();
+		}
+
+		function path_fill_point(_points) {
+
+			path_clear();
+
+            let markers = []
+			let _list = $(`ul.points`);
+			let _select = $(`select.points`);
+            let _point = Object.keys(_points)[0];
+            let _end = null;
+            while(_point != _end) {
+
+                _minutes = _points[_point].minutes
+                _minutes = _minutes == null ? "" : _minutes;
+				let _ref = _point.replace(/\s/g, "_");
+                // Add point to the list
+                _list.append(`
+                    <li>
+						<div class="li_hider">
+							<span>${_point}</span>
+							<form id="p_${_point.replace(/\s/g, "_")}" onsubmit="path_time('${_point.replace(/\s/g, "_")}'); return false;">
+								<label>&#8595</label>
+								<input class="time" type="number" placeholder="Temps" value="${_minutes}"></input>
+								<input class="time_ok" type="submit" value="V" disabled></input>
+							</form>
+						</div>
+                    </li>
+                `);
+				_select.append(`
+					<option value="${_point}">${_point}</option>
+				`)
+
+                // Get marker point
+                latlng = INFOS.points[_point].marker._latlng;
+                markers.push([latlng.lat, latlng.lng]);
+
+                // Go to next point
+                if(_end == null) {
+                    _end = _point;
+                }
+                _point = _points[_point].next;
+            }
+			_list.append(`
+				<li>${_point}</li>
+			`);
+
+			// Set event : double & simple click & change
+			$(`.li_hider`).children(`span`).dblclick(hider);
+			$(`.li_hider`).children(`span`).click(function (event) {
+				$(`.point`).val(($(event.target).text()));
+				$(`.points`).val(($(event.target).text()));
+			});
+			$(`.time`).change(function (event) {
+				$(event.target).parent().children(`.time_ok`).prop(`disabled`, false);
+			});
+
+            // Add again the first point to end the loop
+            latlng = INFOS.points[_end].marker._latlng;
+            markers.push([latlng.lat, latlng.lng]);
+
+            poly_path.setLatLngs(markers);
+            poly_path.addTo(map);
+		}
+
+		
+        function path_add_point() {
+			let _form = $(`#path_add_point`);
+			let _ref = _form.children(`.ref`).val();
+			let _point = _form.children(`.point`).val();
+			let _path = $(`.paths`).val();
+
+			$.get(`${api}/path/${_path}`, {add:_ref, add_after:_point})
+				.done(function (data) {
+					
+					path_load_point(_path);
+
+					$(`.point`).val(_ref);
+					$(`.ref`).val("");
+				});
+		}
+
+		function path_remove_point() {
+			let _form = $(`#path_remove_point`);
+			let _ref = _form.children(`.points`).val();
+			let _path = $(`.paths`).val();
+			
+			$.get(`${api}/path/${_path}`, {remove:_ref})
+				.done(function (data) {
+					
+					path_load_point(_path);
+
+					$(`.points`).val("");
+					$(`.point`).val("");
+				});
+		}
+
+		function path_time(_point) {
+
+			let _form = $(`#p_${_point}`);
+			let _time = _form.children(`.time`).val();
+			let _path = $(`.paths`).val();
+			_point = _form.parent().children("span").text();
+
+            $.get(`${api}/path/${_path}/${_point}`, {minutes: _time})
+                .done(function (data) {
+					_form.children(`.time_ok`).prop(`disabled`, true);
+					console.log("ok");
+                });
+		}
+
+		// ////////////////////////////////////////////////////////////////////
+		// Vehicle
+		// ////////////////////////////////////////////////////////////////////
+
+		let ICON_VEHICULE = L.icon({
+			iconUrl: `/img/vehicule.png`,
+			iconSize:     [10, 10], // size of the icon
+			iconAnchor:   [5, 5], // point of the icon which will correspond to marker's location
+			popupAnchor:  [0, -5] // point from which the popup should open relative to the iconAnchor
+		});
+
+		INFOS.callbacks.push(function () {
+
+			vehicle_clear();
+
+			$.get(`${api}/vehicle`)
+				.done(function (data) {
+					vehicle_fill(data.vehicles);
+				});
+		});
+
+		$(`.vehicles`).change(function (event) {
+
+			let _ref = $(event.target).val();
+			$(`.vehicles`).val(_ref);
+
+		});
+
+		function vehicle_clear() {
+			
+			$(`.vehicles`).children().remove();
+			$(`select.vehicles`).append(`<option value="">-- Véhicules --</option>`);
+		}
+
+		function vehicle_fill(_vehicles) {
+
+			vehicle_clear();
+
+			let _list = $(`ul.vehicles`);
+			let _select = $(`select.vehicles`);
+			INFOS["vehicles"] = {};
+
+			$.each(_vehicles, function (_index, _vehicle) {
+				
+				_list.append(`
+					<li id="${_index}">
+						<span class="num">${_index}</span>
+						<span class="type">(${_vehicle.type})</span>
+						<span class="point">${_vehicle.point}</span>
+						<span class="path">${_vehicle.path == null ? "" : INFOS.paths[_vehicle.path].name}</span>
+					</li>
+				`);
+				_select.append(`
+					<option value="${_index}">${_index}(${_vehicle.type})</option>
+				`);
+
+				INFOS.vehicles[_index] = _vehicle;
+				let _marker = L.marker(INFOS.points[_vehicle.point].marker._latlng);
+				_marker.addTo(map)
+					.bindPopup(`${_index}(${_vehicle.type})`)
+					.setIcon(ICON_VEHICULE)
+				$(_marker._icon).addClass(`cat_vehicle`);
+				INFOS.vehicles[_index]["marker"] = _marker;
+			});
+
+			$(`.num`).click(function (event) {
+				$(`select.vehicles`).val($(event.target).text());
+			});
+		}
+
+		function vehicle_add() {
+			let _form = $(`#vehicle_add`);
+			let _num = _form.children(`.vehicle_num`).val();
+			let _type = _form.children(`.vehicle_type`).val();
+			let _point = _form.children(`.ref`).val();
+
+			$.get(`${api}/vehicle`, {add_id:_num, add_type:_type, add_point:_point})
+				.done(function (data) {
+
+					vehicle_fill(data.vehicles);
+				});
+		}
+
+		function vehicle_remove() {
+			let _form = $(`#vehicle_remove`);
+			let _num = _form.children(`.vehicles`).val();
+
+			$.get(`${api}/vehicle`, {remove:_num})
+				.done(function (data) {
+
+					vehicle_fill(data.vehicles);
+				});
+		}
+
+		function vehicle_link() {
+			let _form = $(`#vehicle_link`);
+			let _num = _form.children(`.vehicles`).val();
+			let _path = _form.children(`.paths`).val();
+
+			if(_path == "")
+				_path = "null";
+
+			$.get(`${api}/vehicle/${_num}`, {path:_path})
+				.done(function (data) {
+					INFOS.vehicles[data.vehicle.id].path = data.vehicle.path;
+
+					$(`li#${data.vehicle.id}`).children(`.path`).html(`
+						${data.vehicle.path == null ? "" : INFOS.paths[data.vehicle.path].name}
+					`);
+				});
+
+		}
+
+		function vehicle_place() {
+			let _form = $(`#vehicle_place`);
+			let _vehicle = _form.children(`.vehicles`).val();
+			let _point = _form.children(`.point_all`).val();
+
+			$.get(`${api}/vehicle/${_vehicle}`, {point:_point})
+				.done(function (data) {
+					INFOS.vehicles[data.vehicle.id].point = data.vehicle.point;
+					INFOS.vehicles[data.vehicle.id].marker.setLatLng(INFOS.points[data.vehicle.point].marker._latlng);
+
+					$(`li#${data.vehicle.id}`).children(`.point`).html(`${data.vehicle.point}`);
+				});
+		}
+
+		// ////////////////////////////////////////////////////////////////////
+		// Parameters
+		// ////////////////////////////////////////////////////////////////////
+
+		function setOrigin(_origin) {
+
+			let _latlng = $(`.pos`).val().split(`,`);
+
+			$.get(`${api}/origin/${_origin}`, {x: _latlng[0], y: _latlng[1]})
+				.done(function (data) {
+					getOrigin();
+				});
+
+		}
+
+	</script>
+</html>

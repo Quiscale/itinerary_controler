@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Carte</title>
+		<link rel="stylesheet" href="operateur.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	</head>
+	<body>
+		<section>
+
+            <div class="bfojef">
+                <h1>Véhicule</h1>
+                <div>
+                    <input id="vehicle_id" type="number" value="" placeholder="Numéro véhicule">
+                </div>
+            </div>
+            <div class="bfojef">
+                <h1>Emplacement</h1>
+                <div>
+                    <select id="points" disabled>
+                        <option value="">- - Position - -</option>
+                    </select>
+                </div>
+            </div>
+            <div class="bfojef">
+                <h1>Remplissage</h1>
+                <div class="qzqdfn">
+                    <h2>Mallette</h2>
+                    <input id="mallette" type="range" value="0" min="0" max="100" step="10" disabled>
+                    <div><span>20</span><span>50</span><span>80</span></div>
+                    <h2>Kanban</h2>
+                    <input id="kanban" type="range" value="0" min="0" max="100" step="10" disabled>
+                    <div><span>20</span><span>50</span><span>80</span></div>
+                    <h2>Consommable</h2>
+                    <input id="consommable" type="range" value="0" min="0" max="100" step="10" disabled>
+                    <div><span>20</span><span>50</span><span>80</span></div>
+                </div>
+            </div>
+            <div class="bfonfl">
+                <input id="iGo" type="button" value="Je démarre" disabled>
+                <input id="validator" type="button" value="Valider" disabled>
+            </div>
+
+        </section>
+    </body>
+    <script>
+
+        let api = "http://127.0.0.1:8000";
+        let time = null;
+
+        // ////////////////////////////////////////////////////////////////////
+        // Event
+
+        $("#vehicle_id").change(function () {
+
+            $.get(`${api}/vehicle/${$("#vehicle_id").val()}`)
+                .done(function (data) {
+
+                    let _vehicle = data.vehicle;
+                    
+                    $("#mallette").val(_vehicle.mallette);
+                    $("#kanban").val(_vehicle.kanban);
+                    $("#consommable").val(_vehicle.consommable);
+
+                    $.get(`${api}/path/${_vehicle.path}`)
+                        .done(function (data) {
+
+                            fill_select(data.points);
+
+                            $("#points").val(`${_vehicle.point}`);
+
+                            $("select").prop("disabled", false);
+                            $("input").prop("disabled", false);
+                        });
+                });
+        });
+
+        $("#iGo").click(function (event) {
+            
+            let _start = new Date();
+            let _end = new Date(_start.getTime() -0 +time*60*1000);
+            
+            // Set vehicle position
+            $.get(`${api}/vehicle/${$("#vehicle_id").val()}`, {point: "W15"})
+                .done(function (data) {
+
+                    $("#points").val(`W15`);
+                });
+            // Set vehicle start and stop time
+            $.get(`${api}/vehicle/${$("#vehicle_id").val()}/start`, {hour_start: _start.getTime(), hour_end: _end.getTime()})
+                .done(function (data) {
+
+                });
+            // Set vehicle quantities
+            $.get(`${api}/vehicle/${$("#vehicle_id").val()}/fill`, {mallette: 0, kanban: 0, consommable: 0})
+                .done(function (data) {
+
+                    $("#mallette").val(0);
+                    $("#kanban").val(0);
+                    $("#consommable").val(0);
+                });
+        });
+
+        $("#validator").click(function (event) {
+            
+            $.get(`${api}/vehicle/${$("#vehicle_id").val()}`, {point: $("#points").val()})
+                .done(function (data) {
+                    console.log("position enregistrée");
+                });
+            $.get(`${api}/vehicle/${$("#vehicle_id").val()}/fill`, {mallette: $("#mallette").val(), kanban: $("#kanban").val(), consommable: $("#consommable").val()})
+                .done(function (data) {
+                    console.log("remplissage enregistré");
+                });
+
+        });
+
+        // ////////////////////////////////////////////////////////////////////
+        // Functions
+
+        function fill_select(_points) {
+
+            let _point = "W15";
+
+            let _time = 0;
+
+			do {
+
+                $("#points").append(`<option value="${_point}">${_point}</option>`);
+
+                _time += _points[_point].minutes;
+				// Passage au point suivant
+				_point = _points[_point].next;
+			} while(_point != "W15");
+
+            time = _time;
+
+        }
+
+    </script>
+</html>

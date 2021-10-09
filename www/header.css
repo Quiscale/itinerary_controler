@@ -1,0 +1,66 @@
+
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	height: 100%;
+}
+
+
+/* ****************************************************************************
+ * 
+ * Header
+ * 
+ */
+
+header {
+	width: 100%;
+	background-color: #003656;
+    height: 100px;
+}
+
+header > * {
+	display: inline-block;
+    height: 100%;
+}
+
+#logo {
+	width: 130px;
+    height: 100px;
+    background: url(data:image/png;base64,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) 0 center/contain no-repeat #003656;
+	float: left;
+}
+
+#band {
+	padding: 0 50px;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: center;
+}
+
+#title > a {
+	text-decoration: none;
+	font: bold 40px "Gotham";
+	color: #fff;
+}
+
+nav > a {
+	border-bottom: 2px solid #fff;
+
+	bottom: 0;
+	display: inline-block;
+	width: 7em;
+
+	text-align: center;
+	text-decoration: none;
+	font: bold 30px "Gotham";
+	color: #fff;
+}
+
+#selected {
+	color: #003656;
+	background-color: #fff;
+
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Carte</title>
+		<link rel="stylesheet" href="resume.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	</head>
+	<body>
+		<section>
+			<div class="bfojef">
+				<h1>Tournée Milkrun</h1>
+			</div>
+			<div class="bfojef">
+				<h1>Heure</h1>
+				<div>
+					<div class="fczmdz">
+						<span>Départ</span><span>Arrivée</span>
+					</div>
+					<div class="fczamo">
+						<div class="progress">
+							<div class="progress_background" style="width: 80%;"></div>
+							<span class="hour_start">- - -</span><span><span class="hour_diff">- -↑ </span><span class="hour_end">- - -</span></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="bfojef">
+				<h1>Taux de remplissage</h1>
+				<div>
+					<div class="vomevg">
+						<div class="values">
+							<span style=>25</span><span>50</span><span>75</span>
+						</div>
+					</div>
+					<div class="vomevg">
+						<h2>Mallette</h2>
+						<div class="gauge">
+							<div id="mallette" class="gauge_background" style="width: 25%;"></div>
+							<span></span><span></span><span></span>
+						</div>
+					</div>
+					<div class="vomevg">
+						<h2>Kanban</h2>
+						<div class="gauge">
+							<div id="kanban" class="gauge_background" style="width: 50%;"></div>
+							<span></span><span></span><span></span>
+						</div>
+					</div>
+					<div class="vomevg">
+						<h2>Consommable</h2>
+						<div class="gauge">
+							<div id="consommable" class="gauge_background" style="width: 75%;"></div>
+							<span></span><span></span><span></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			
+		</section>
+	</body>
+	<script>
+
+		let api = "http://127.0.0.1:8000";
+		
+		let params = new URLSearchParams(window.location.search);
+		if(params.has("path")) {
+			let path = params.get("path");
+			
+			initialize_with_path_id(path);
+		}
+
+		// ////////////////////////////////////////////////////////////////////
+		// Functions
+		// ////////////////////////////////////////////////////////////////////
+
+		/**
+		 * 
+		 */
+		function initialize_with_path_id(_path) {
+
+			let vehicle = null;
+			let path = null;
+			let points = null;
+
+			$.get(`${api}/vehicle`, {path: _path})
+				.done(function (data) {
+
+					$.each(data.vehicles, function (_id, _vehicle) {
+						vehicle = _vehicle;
+						vehicle["id"] = _id;
+					});
+					
+					$.get(`${api}/path/${_path}`)
+						.done(function (data) {
+
+							path = data.path;
+							points = data.points;
+
+							if(vehicle != null)
+								calculate_vehicle_stats(vehicle, path, points);
+							else 
+								console.log("Aucun vehicule")
+						});
+				});
+		}
+
+		/**
+		 * 
+		 */
+		function calculate_vehicle_stats(_vehicle, _path, _points) {
+
+			$("#mallette").css("width", `${_vehicle.mallette}%`);
+			$("#kanban").css("width", `${_vehicle.kanban}%`);
+			$("#consommable").css("width", `${_vehicle.consommable}%`);
+
+			$("#mallette").css("background-color", _vehicle.mallette < 50 ? "#009ee0" : 
+												   _vehicle.mallette < 75 ? "#FFF200" : "#FF0000");
+			$("#kanban").css("background-color", _vehicle.kanban < 50 ? "#009ee0" :
+												 _vehicle.kanban < 75 ? "#FFF200" : "#FF0000");
+			$("#consommable").css("background-color", _vehicle.consommable < 50 ? "#009ee0" :
+													  _vehicle.consommable < 75 ? "#FFF200" : "#FF0000");
+
+
+			let _point = _vehicle.point;
+			let _start = new Date(_vehicle.hour_start -0);
+			let _end = new Date(_vehicle.hour_end -0);
+			let _now = new Date();
+			let _time = 0;
+			let _posFromEnd = 0;
+
+			console.log(_points);
+
+			do {
+				_time += _points[_point].minutes;
+				_posFromEnd += 1;
+				// Passage au point suivant
+				console.log(_point);
+				_point = _points[_point].next;
+			} while(_point != "W15");
+
+			let _newEnd = new Date(_now.getTime() +_time*60*1000);
+			let _timeDiff = ((_newEnd.getTime() -_end.getTime())/(1000*60))|0;
+
+			$(".progress_background").css("width", `${100 -(_posFromEnd/Object.keys(_points).length)*100}%`);
+
+			$(".hour_start").html(`${_start.getHours()}H${('0' +_start.getMinutes()).slice(-2)}`);
+			$(".hour_end").html(`${_newEnd.getHours()}H${('0' +_newEnd.getMinutes()).slice(-2)}`);
+
+			if(_timeDiff >= 0) {
+				$(".hour_diff").html(`+${_timeDiff}min ↑  `);
+				$(".hour_diff").css("color", "#700");
+			}
+			else {
+				$(".hour_diff").html(`${_timeDiff}min ↓  `);
+				$(".hour_diff").css("color", "#070");
+			}
+
+		}
+
+	</script>
+</html>

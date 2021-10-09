@@ -1,0 +1,130 @@
+
+/* ****************************************************************************
+ * Tools
+ * ***************************************************************************/
+
+#tools {
+    flex-direction: column;
+
+	width: 28%;
+	height: 100%;
+	border: 2px solid black;
+	background-color: #EEE;
+}
+
+#tools > * {
+    display: flex;
+
+    position: relative;
+}
+
+.tool_button {
+    min-width: 5rem;
+    width: 25%;
+    height: 2rem;
+    margin: 1px;
+    border-width: 1px; 
+    border-radius: 0px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.tool_parameter {
+    position:absolute;
+    right: 0;
+    height: 2rem;
+    width: 2rem;
+    margin: 1px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+#tool {
+    display: flex;
+    flex-grow: 1;
+    border-top: black solid 2px;
+}
+
+#point, #path, #vehicle, #parameters {
+    display: none;
+    flex-direction: column;
+    flex-grow: 1;
+
+    padding: 10px;
+}
+
+#parameters {
+    display: flex;
+}
+
+/* ****************************************************************************
+ * Hider
+ * ***************************************************************************/
+
+.hider {
+    display: flex;
+    flex-direction: column;
+
+    margin: 0.2rem;
+    border: black solid 1px;
+}
+.hider > span {
+    display: flex;
+    margin: 0.3rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+.hider > form {
+    display: none;
+    flex-direction: column;
+}
+
+/* ****************************************************************************
+ * Lists
+ * ***************************************************************************/
+
+.ul {
+    display: flex;
+    flex-grow: 1;
+}
+.ul > ul {
+    width: 100%;
+    max-height: 100%;
+    overflow-y: scroll;
+}
+.li_hider {
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+}
+.li_hider > span {
+    display: flex;
+    cursor: pointer;
+}
+.li_hider > form {
+    display: none;
+    flex-direction: row;
+}
+
+/* ****************************************************************************
+ * Origin
+ * ***************************************************************************/
+
+#origin {
+    display: flex;
+    flex-direction: column;
+}
+
+#origin > * {
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    margin: 2px 0;
+    box-sizing: border-box;
+}
+
+#origin > div > * {
+    display: flex;
+    width: 50%;
+}

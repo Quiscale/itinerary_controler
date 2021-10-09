@@ -1,0 +1,31 @@
+#apps {
+
+	margin: 30px auto;
+	width: max-content;
+
+}
+
+.app {
+	display: inline-block;
+	width: 100px;
+	height: 150px;
+	margin: 0 20px;
+	text-decoration: none;
+}
+
+.app > * {
+	display: block;
+}
+
+.app > img {
+	width: 100px;
+	height: 100px;
+}
+
+.app > h3 {
+
+	font: bold 20px "Gotham bold";
+	color: #009ee0;
+	text-align: center;
+  
+}

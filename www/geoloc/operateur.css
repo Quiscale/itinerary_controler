@@ -1,0 +1,138 @@
+
+html {
+    width: 100%;
+}
+
+body {
+	margin: 0;
+	height: 100%;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    
+	width: 100%;
+	padding: 0;
+	position:absolute;
+	top: 0;
+	bottom: 0;
+}
+
+/* ****************************************************************************
+ * Div base
+ */
+ 
+.bfojef {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: #003656 solid 1px;
+    padding: 0;
+    margin: 2rem 0;
+    width: 40rem;
+    height: fit-content;
+}
+.bfojef > h1 {
+    display: flex;
+    justify-content: center;
+    font-size: 3rem;
+    padding: 0;
+    margin: 0;
+    background-color: #003656;
+    color: white;
+}
+.bfojef > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.bfonfl {
+    display: flex;
+    flex-direction: row;
+
+    box-sizing: border-box;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+/* ****************************************************************************
+ * 
+ */
+
+input#vehicle_id {
+    display: flex;
+
+    width: 70%;
+    height: 5rem;
+    border: #009de0 solid 2px;
+    box-sizing: border-box;
+
+    color: #003656;
+    font-size: 3rem;
+    text-align: center;
+}
+
+.bfonfl > input {
+    display: flex;
+    
+    width: 20rem;
+    height: 5rem;
+
+    color: #003656;
+    font-size: 3rem;
+    justify-content: center;
+}
+
+select {
+    display: flex;
+
+    width: 70%;
+    height: 5rem;
+    border: #009de0 solid 2px;
+
+    color: #003656;
+    font-size: 3rem;
+}
+option {
+    display: flex;
+    
+    color: #003656;
+    font-size: 1.2rem;
+}
+
+.qzqdfn > h2 {
+    display: flex;
+    
+    margin: 1rem 0 0 0;
+
+    color: #003656;
+    font-size: 3rem;
+}
+.qzqdfn > input {
+
+    width: 70%;
+}
+.qzqdfn > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    width: 70%;
+    margin-bottom: 1rem;
+}
+
+
+span {
+    display: flex;
+    justify-content: center;
+
+    color: #003656;
+    font-size: 2rem;
+    width: 20%;
+}

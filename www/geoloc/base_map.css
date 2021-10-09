@@ -1,0 +1,27 @@
+#map {
+	width: 70%;
+	height: 100%;
+	border: 2px solid black;
+	background-color: #EEE;
+}
+
+#map > .categories {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	bottom: 0;
+	margin: 10px;
+	padding: 0;
+	z-index: 500;
+	list-style-type: none;
+}
+
+#map > .alert {
+	display: none;
+	position: absolute;
+	right: 0;
+	margin: 10px;
+	z-index: 500;
+    font-size: 1.5rem;
+    color: #f33
+}
